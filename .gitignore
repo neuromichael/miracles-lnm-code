@@ -1,0 +1,10 @@
+# Never commit participant data or derived subject-level files
+*.xlsx
+*.xls
+*.csv
+*.nii
+*.nii.gz
+run_log*.txt
+outputs/
+__pycache__/
+.DS_Store
