@@ -8,7 +8,7 @@ as the real (non-public) behavioral files. Two IDs have scores but no images,
 to exercise the exclusion branch. Nothing here resembles real participant data.
 
 Usage: python make_synthetic_data.py <output_dir>
-Creates <output_dir>/images and <output_dir>/data.
+Creates <output_dir>/images, <output_dir>/data and <output_dir>/terms (random term maps).
 """
 import os, sys
 import numpy as np, pandas as pd, nibabel as nib
@@ -40,6 +40,12 @@ pd.DataFrame({"id_nih": all_ids, **hope}).to_excel(os.path.join(dat_dir, "Datase
                                                    sheet_name="data", index=False)
 m = pd.DataFrame({"subject_id": ids, "miracles_score": mir[:len(ids)],
                   "magical_ideation_total": sum(magic.values())[:len(ids)],
-                  "network_file_full_path": [os.path.join(img_dir, f"{i:04d}_func_seed_T.nii") for i in ids]})
+                  "network_file_full_path": [os.path.join(img_dir, f"{i:04d}_func_seed_T.nii") for i in ids],
+                  "lesion_file_full_path": [os.path.join(img_dir, f"{i:04d}.nii") for i in ids]})
 m.to_excel(os.path.join(dat_dir, "miracles_magical_network_matched.xlsx"), sheet_name="matched", index=False)
+term_dir = os.path.join(root, "terms"); os.makedirs(term_dir, exist_ok=True)
+for t in ["medial prefrontal", "medial", "prefrontal", "theory mind", "prefrontal cortex",
+          "default", "autobiographical", "mind", "mind tom", "default mode"]:
+    nib.save(nib.Nifti1Image(rng.normal(0, 1, shape).astype(np.float32), aff),
+             os.path.join(term_dir, f"terms_abstract_tfidf__{t}.z_desc-association.nii.gz"))
 print(f"wrote {len(ids)} subjects to {root}")

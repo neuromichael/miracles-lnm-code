@@ -39,8 +39,10 @@ The output is the unthresholded t map for the score regressor. Lesion volume (mm
 | `06_religious_hope_fdr_fwe.py` | FDR (Benjamini-Hochberg) and FWE (Freedman-Lane, 5,000 permutations, max statistic) thresholding of the Hope map |
 | `07_religious_hope_items_voxelwise_lnm.py` | One map per Hope item and their pairwise spatial correlations |
 | `08_miracles_vs_magical_contrast.py` | Joint model with both scores and the contrast b_miracles minus b_magical; map submitted to the Neurosynth decoder |
+| `09_contrast_decoding_permutation.py` | Permutation test (Freedman-Lane, 5,000 permutations) of the contrast map's spatial correlation with the ten top decoded Neurosynth terms, with z-scored scores and lesion volume as nuisance; also voxelwise FWE for the contrast |
+| `10_contrast_decoding_permutation_allterms.py` | Same test with the decoding repeated over all term maps inside every permutation, so the null distribution includes the selection of the top terms |
 
-Scripts 04 and 06 read the outputs of 01, 03 and 05, so run the scripts in numerical order.
+Scripts 04 and 06 read the outputs of 01, 03 and 05, so run the scripts in numerical order. Scripts 09 and 10 also need `NEUROSYNTH_TERM_DIR`, a folder of Neurosynth association test z maps named `terms_abstract_tfidf__<term>.z_desc-association.nii.gz`; they are resampled to the data grid, which corrects the opposite x-axis orientation of the Neurosynth maps.
 
 The Neurosynth decoding used the web decoder (https://neurosynth.org/decode/) on the unthresholded contrast map written by script 08.
 
@@ -64,6 +66,9 @@ export VHIS_DATA_DIR=/path/to/spreadsheets  # see data/README.md
 export VHIS_OUTPUT_DIR=/path/to/outputs
 for s in lnm/0[1-7]_*.py; do python "$s"; done
 python lnm/08_miracles_vs_magical_contrast.py --xlsx "$VHIS_DATA_DIR/miracles_magical_network_matched.xlsx" --outdir "$VHIS_OUTPUT_DIR/miracles_vs_magical_contrast"
+export NEUROSYNTH_TERM_DIR=/path/to/neurosynth_term_maps
+python lnm/09_contrast_decoding_permutation.py
+python lnm/10_contrast_decoding_permutation_allterms.py
 ```
 
 Each script writes its maps, an `included_subjects.csv` and a timestamped `run_log.txt` to its own folder under `VHIS_OUTPUT_DIR`.
